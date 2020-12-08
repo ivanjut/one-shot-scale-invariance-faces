@@ -28,7 +28,7 @@ def main():
                 Use feature vector to get same/different classification accuracy
     """
 
-    k = 2
+    k = 4
     k_fold = 0
     model_names = ['vgg19', 'resnet101', 'densenet169', 'cornet2']
     accuracies = {model_name:{'implementation_0':{}, 'implementation_1':{}, 'implementation_2':{}} for model_name in model_names}
@@ -40,17 +40,19 @@ def main():
         train_negative_pairs, train_positive_pairs = train_pairs[0], train_pairs[1]
         for model_name in model_names:
             idx_to_vec = get_idx_to_vec(model_name)
-            for i,implementation in enumerate([implementation_0]):
+            for i,implementation in enumerate([implementation_0, implementation_2]):
                 print("Model: {}, k_fold: {}, Implementation: {}".format(model_name, k_fold, i))
 
-            # Implementation 0: Feature Vector Cosine Similarity Classifier
-            # Implementation 1: SVM Classifier Pair Feature Vector Difference as input 
-            # Implementation 2: MLP with multiclass output and Feature Vector Cosine Similarity Classifier for new points
-            for c in range(len(c_test_offset_values)):
-                test_negative_pairs, test_positive_pairs = get_test_pairs(test_pairs[0], test_pairs[1], c, len(c_test_offset_values))
-                implementation_accuracy = implementation.main(train_negative_pairs, train_positive_pairs, test_negative_pairs, test_positive_pairs, idx_to_vec)
-                c_accuracy_list = accuracies[model_name]['implementation_{}'.format(i)].get(c, []) + [implementation_accuracy]
-                accuracies[model_name]['implementation_{}'.format(i)][c] = c_accuracy_list
+                # Implementation 0: Feature Vector Cosine Similarity Classifier
+                # Implementation 1: SVM Classifier Pair Feature Vector Difference as input 
+                # Implementation 2: MLP with multiclass output and Feature Vector Cosine Similarity Classifier for new points
+                model = implementation.train(train_negative_pairs, train_positive_pairs, idx_to_vec)
+                for c in range(len(c_test_offset_values)):
+                    test_negative_pairs, test_positive_pairs = get_test_pairs(test_pairs[0], test_pairs[1], c, len(c_test_offset_values))
+                    implementation_accuracy = implementation.get_classification_accuracy(model, test_negative_pairs, test_positive_pairs, idx_to_vec)
+                    c_accuracy_list = accuracies[model_name]['implementation_{}'.format(i)].get(c, []) + [implementation_accuracy]
+                    accuracies[model_name]['implementation_{}'.format(i)][c] = c_accuracy_list
+                    print(c, implementation_accuracy)
         k_fold += 1
 
     return accuracies
@@ -59,7 +61,7 @@ def main():
 if __name__ == '__main__':
     accuracies = main()
     print(accuracies)
-    with open('./accuracies.json', 'w') as f:
+    with open('./accuracies_k={}.json'.format(4), 'w') as f:
         json.dump(accuracies, f)
 
     # data = json.load(open('accuracies.json'))

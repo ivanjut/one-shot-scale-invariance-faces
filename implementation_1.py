@@ -32,7 +32,6 @@ def train(train_negative_pairs, train_positive_pairs, idx_to_vec, cv=True):
                              )
     train_x, train_y = svm_preprocessing(train_negative_pairs, train_positive_pairs, idx_to_vec)
     svm = svm.fit(train_x,train_y)
-
     if cv:
         print(svm.best_params_)
     return svm
@@ -43,6 +42,6 @@ def get_classification_accuracy(svm, test_negative_pairs, test_positive_pairs, i
     return svm.score(test_x, test_y)
 
 def main(train_negative_pairs, train_positive_pairs, test_negative_pairs, test_positive_pairs, idx_to_vec):
-    model = train(train_negative_pairs, train_positive_pairs, idx_to_vec, False)
+    model = train(train_negative_pairs, train_positive_pairs, idx_to_vec, True)
     accuracy = get_classification_accuracy(model, test_negative_pairs, test_positive_pairs, idx_to_vec)
     return accuracy

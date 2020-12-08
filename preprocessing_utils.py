@@ -55,6 +55,8 @@ def k_fold_sample(k, train_c_offset_values, test_c_offset_values):
         mask[test_face_idxs] = False
         train_face_idxs = np.arange(400)[mask]
 
+        assert len((set(train_face_idxs).intersection(test_face_idxs))) == 0
+
         train_negative_pairs, train_positive_pairs = get_dataset_idxs(train_face_idxs, train_c_offset_values, for_training=True)
         test_negative_pairs, test_positive_pairs = get_dataset_idxs(test_face_idxs, test_c_offset_values, for_training=False)
 
@@ -74,7 +76,5 @@ def get_test_pairs(all_sizes_test_negative_pairs, all_sizes_test_positive_pairs,
 
 if __name__ == "__main__":
 
-    for train_pairs, test_pairs in k_fold_sample(4, range(5), range(5)):
-
-        print(train_pairs)
+    for train_pairs, test_pairs in k_fold_sample(2, range(5), range(5)):
         break

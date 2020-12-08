@@ -1,5 +1,6 @@
 import numpy as np
 
+import matplotlib.pyplot as plt
 from sklearn.metrics import roc_auc_score
 
 def cos_sim(a,b):
@@ -27,20 +28,20 @@ def find_highest_accuracy_threshold(samples):
     """
     Returns threshold c for classifier of the form sign(x - c)
     """
-    sorted_samples = sorted(samples, key=lambda x: x[0])
-
-    true_positives = np.sum([sample[1] for sample in samples])
-    true_negatives = 0
+    similarities = np.array([sample[0] for sample in samples])
+    labels = np.array([sample[1] for sample in samples])
 
     best_accuracy, best_threshold = 0,0
 
-    for threshold,label in sorted_samples:
-        if label == 0:
-            true_negatives += 1
-        else:
-            true_positives -= 1
+    for threshold,_ in samples:
 
-        accuracy = (true_positives + true_negatives) / len(samples)
+        predicted_positive_mask = similarities > threshold
+        predicted_negative_mask = similarities <= threshold
+
+        num_true_positives = np.sum(labels[predicted_positive_mask])
+        num_true_negatives = np.sum(labels[predicted_negative_mask] == 0)
+
+        accuracy = (num_true_positives + num_true_negatives) / len(samples)
         if accuracy > best_accuracy:
             best_accuracy, best_threshold = accuracy, threshold
             
@@ -50,11 +51,19 @@ def similarity_classifier_accuracy(test_negative_pairs, test_positive_pairs, idx
 
     positive_pair_similarities = compare_img_pairs(test_positive_pairs, idx_to_vec, use_corr=use_corr)
     negative_pair_similarities = compare_img_pairs(test_negative_pairs, idx_to_vec, use_corr=use_corr)
+    
+    print("Positive Pair Similarity Median: {}".format(np.median(positive_pair_similarities)))
+    print("Negative Pair Similarity Median: {}".format(np.median(negative_pair_similarities)))
 
-    similarities = negative_pair_similarities + positive_pair_similarities
-    labels = np.concatenate((np.zeros(len(negative_pair_similarities)), np.ones(len(positive_pair_similarities))))
+    similarities = positive_pair_similarities + negative_pair_similarities
+    labels = np.concatenate((np.ones(len(positive_pair_similarities)), np.zeros(len(negative_pair_similarities))))
     samples = [(similarities[i],labels[i]) for i in range(len(similarities))]
+
+    print("AUC: {}".format(roc_auc_score(labels, similarities)))
 
     best_threshold, best_accuracy = find_highest_accuracy_threshold(samples)
 
-    return best_accuracy
+    print("Accuracy: {}".format(best_accuracy))
+    print("Threshold: {}".format(best_threshold))
+
+    return best_accuracy, best_threshold
