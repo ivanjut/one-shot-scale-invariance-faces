@@ -35,12 +35,12 @@ def get_negative_pairs(face_idxs, c_offset_values):
             for j in face_idxs:
                 # ensures i != j and that there are no duplicate pairs
                 if i > j: 
-                    pair_idxs = ((5*i)+3,(5*j)+3+c)
+                    pair_idxs = (1+(5*i),1+(5*j)+c)
                     negative_pairs.append(pair_idxs)
     return negative_pairs
 
 def get_dataset_idxs(face_idxs, c_offset_values, for_training=True):
-    positive_pairs = np.array([((5*i)+3,(5*i)+3+c) for c in c_offset_values for i in face_idxs])
+    positive_pairs = np.array([(1+(5*i),1+(5*i)+c) for c in c_offset_values for i in face_idxs])
     all_negative_pairs = np.array(get_negative_pairs(face_idxs, c_offset_values))
     if for_training:
         negative_pairs = all_negative_pairs[list(np.random.choice(len(all_negative_pairs), face_idxs.shape[0] * len(c_offset_values), replace=False)), :]
@@ -74,9 +74,7 @@ def get_test_pairs(all_sizes_test_negative_pairs, all_sizes_test_positive_pairs,
 
 if __name__ == "__main__":
 
-    for train_pairs, test_pairs in k_fold_sample(4, [-2,-1,1,2], [-2,-1,1,2]):
+    for train_pairs, test_pairs in k_fold_sample(4, range(5), range(5)):
 
-        n,p = get_test_pairs(test_pairs[0], test_pairs[1], 0, 4)
-        print(n.shape)
-        print(p.shape)
+        print(train_pairs)
         break

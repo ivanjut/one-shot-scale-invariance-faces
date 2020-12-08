@@ -33,8 +33,8 @@ def main():
     model_names = ['vgg19', 'resnet101', 'densenet169', 'cornet2']
     accuracies = {model_name:{'implementation_0':{}, 'implementation_1':{}, 'implementation_2':{}} for model_name in model_names}
     
-    c_train_offset_values = [-2,-1,1,2]
-    c_test_offset_values = [-2,-1,1,2]
+    c_train_offset_values = [0,1,2,3,4]
+    c_test_offset_values = [0,1,2,3,4]
 
     for train_pairs, test_pairs in k_fold_sample(k, c_train_offset_values, c_test_offset_values):
         train_negative_pairs, train_positive_pairs = train_pairs[0], train_pairs[1]
