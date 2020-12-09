@@ -21,12 +21,12 @@ def svm_preprocessing(negative_pairs, positive_pairs, idx_to_vec):
     return x, y
 
 
-def train(train_negative_pairs, train_positive_pairs, idx_to_vec, cv=True):
+def train(train_negative_pairs, train_positive_pairs, idx_to_vec, cv=False):
     svm = SVC(kernel='rbf')
     if cv:
-        svm = GridSearchCV(cv=5,
+        svm = GridSearchCV(cv=2,
                              estimator=svm,
-                             param_grid={"C": [10**(i) for i in range(-5,6)]},
+                             param_grid={"C": [10**(-6), 10**(-4), 10**(-2), 1, 100]},
                              scoring='accuracy',
                              refit=True
                              )
@@ -40,8 +40,3 @@ def train(train_negative_pairs, train_positive_pairs, idx_to_vec, cv=True):
 def get_classification_accuracy(svm, test_negative_pairs, test_positive_pairs, idx_to_vec):
     test_x, test_y = svm_preprocessing(test_negative_pairs, test_positive_pairs, idx_to_vec)
     return svm.score(test_x, test_y)
-
-def main(train_negative_pairs, train_positive_pairs, test_negative_pairs, test_positive_pairs, idx_to_vec):
-    model = train(train_negative_pairs, train_positive_pairs, idx_to_vec, True)
-    accuracy = get_classification_accuracy(model, test_negative_pairs, test_positive_pairs, idx_to_vec)
-    return accuracy

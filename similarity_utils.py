@@ -6,7 +6,7 @@ from sklearn.metrics import roc_auc_score
 def cos_sim(a,b):
     dot = np.dot(a, b.T)
     norm_product = np.linalg.norm(a)*np.linalg.norm(b)
-    return dot / norm_product
+    return dot / (norm_product + 1e-6)
 
 def compare_img_pairs(pair_idxs, idx_to_vec, use_corr=False):
     
@@ -66,4 +66,6 @@ def similarity_classifier_accuracy(test_negative_pairs, test_positive_pairs, idx
     print("Accuracy: {}".format(best_accuracy))
     print("Threshold: {}".format(best_threshold))
 
-    return best_accuracy, best_threshold
+    return best_accuracy
+
+

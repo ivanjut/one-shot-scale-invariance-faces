@@ -34,6 +34,7 @@ def train(train_negative_pairs, train_positive_pairs, idx_to_vec):
 
     mlp = MLPClassifier(hidden_layer_sizes=[512], max_iter=10000)
     model = mlp.fit(train_faces, train_faces_labels)
+    print(model.loss_)
     return model
 
 def get_classification_accuracy(mlp, test_negative_pairs, test_positive_pairs, idx_to_vec, use_corr=False):
@@ -72,6 +73,5 @@ if __name__ == "__main__":
         print("Num Negative Test Pairs: {}".format(len(test_negative_pairs)))
         print("Num Positive Test Pairs: {}".format(len(test_positive_pairs)))
         model = train(train_negative_pairs, train_positive_pairs, idx_to_vec)
-        accuracy, threshold = get_classification_accuracy(model, test_negative_pairs, test_positive_pairs, idx_to_vec)
+        accuracy = get_classification_accuracy(model, test_negative_pairs, test_positive_pairs, idx_to_vec)
         print("Accuracy: {}".format(accuracy))
-        print("threshold: {}".format(threshold))

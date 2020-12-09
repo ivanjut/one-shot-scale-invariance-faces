@@ -28,19 +28,19 @@ def main():
                 Use feature vector to get same/different classification accuracy
     """
 
-    k = 4
+    k = 8
     k_fold = 0
-    model_names = ['vgg19', 'resnet101', 'densenet169', 'cornet2']
+    model_names = ['resnet101', 'vgg19', 'densenet169', 'cornet2']
     accuracies = {model_name:{'implementation_0':{}, 'implementation_1':{}, 'implementation_2':{}} for model_name in model_names}
     
     c_train_offset_values = [0,1,2,3,4]
     c_test_offset_values = [0,1,2,3,4]
 
-    for train_pairs, test_pairs in k_fold_sample(k, c_train_offset_values, c_test_offset_values):
-        train_negative_pairs, train_positive_pairs = train_pairs[0], train_pairs[1]
-        for model_name in model_names:
-            idx_to_vec = get_idx_to_vec(model_name)
-            for i,implementation in enumerate([implementation_0, implementation_2]):
+    for model_name in model_names:
+        idx_to_vec = get_idx_to_vec(model_name)
+        for train_pairs, test_pairs in k_fold_sample(k, c_train_offset_values, c_test_offset_values):
+            train_negative_pairs, train_positive_pairs = train_pairs[0], train_pairs[1]
+            for i,implementation in [(0, implementation_0), (1,implementation_1)]:
                 print("Model: {}, k_fold: {}, Implementation: {}".format(model_name, k_fold, i))
 
                 # Implementation 0: Feature Vector Cosine Similarity Classifier
@@ -61,9 +61,10 @@ def main():
 if __name__ == '__main__':
     accuracies = main()
     print(accuracies)
-    with open('./accuracies_k={}.json'.format(4), 'w') as f:
+    with open('./accuracies_k={}.json'.format(8), 'w') as f:
         json.dump(accuracies, f)
 
-    # data = json.load(open('accuracies.json'))
-    # df = pd.concat({k: pd.DataFrame(v) for k, v in data.items()}, axis=0)
-    # print(df)
+    # pd.set_option('display.max_colwidth', -1)
+    # data = json.load(open('accuracies_k=3.json'))
+    # df = pd.concat({k: pd.DataFrame(v,) for k, v in data.items()}, axis=0)
+    # print(df.round(3))
