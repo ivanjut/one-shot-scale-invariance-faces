@@ -56,7 +56,7 @@ def get_classification_accuracy(mlp, test_negative_pairs, test_positive_pairs, i
 
 if __name__ == "__main__":
 
-    idx_to_vec = get_idx_to_vec('densenet169')
+    idx_to_vec = get_idx_to_vec('resnet101')
     c_test_offset_values = [0,1,2,3,4]
     accuracies = {c:[] for c in c_test_offset_values}
     k_fold = 0
